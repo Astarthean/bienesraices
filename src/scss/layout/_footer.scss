@@ -1,0 +1,14 @@
+.footer {
+    padding: $separacion * 0.5 0;
+    background-color: $grisOscuro;
+    margin-bottom: 0;
+
+    .contenido-footer {
+        padding-top: $separacion * 0.5;
+    }
+
+    .copyright {
+        color: $blanco;
+        text-align: center;
+    }
+}
