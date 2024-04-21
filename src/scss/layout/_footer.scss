@@ -7,6 +7,12 @@
         padding-top: $separacion * 0.5;
     }
 
+    .navegacion {
+        visibility: visible;
+        opacity: 1;
+        height: auto;
+    }
+
     .copyright {
         color: $blanco;
         text-align: center;
