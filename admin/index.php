@@ -1,22 +1,10 @@
 <?php
 
-require '../includes/funciones.php';
+require '../includes/app.php';
 
-$auth = estaAutenticado();
+estaAutenticado();
 
-if (!$auth) {
-    header('Location: /');
-}
-
-//Importar conexion DB
-require '../includes/config/database.php';
-$db = conectarDB();
-
-//Escribir el Query
-$query = "SELECT * FROM propiedades";
-
-//Consultar la BD
-$resultadoConsulta = mysqli_query($db, $query);
+//Implementar un método para obtener todas las propiedades
 
 //La doble interrogación con null asigna un valor NULL si la variable resultado no esta  definida
 $resultado = $_GET['resultado'] ?? null;

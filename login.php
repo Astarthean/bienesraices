@@ -1,6 +1,7 @@
 <?php 
 
-require 'includes/config/database.php';
+//Include del header
+require 'includes/app.php';
 $db = conectarDB();
 
 //Autenticar el usuario
@@ -49,8 +50,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-//Include del header
-require 'includes/funciones.php';
+
 incluirTemplate('header');
 ?>
 
