@@ -22,15 +22,15 @@ $errores = Propiedad::getErrores();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     //Crear una nueva instancia
-    $propiedad = new Propiedad($_POST);
+    $propiedad = new Propiedad($_POST['propiedad']);
 
     //Generar nombre único para la imagen
     $nombreImagen = md5(uniqid(rand(), true)) . ".jpg";
 
     //Setear la imagen
     //Resize de la imagen con Intervention
-    if ($_FILES['imagen']['tmp_name']) {
-        $image = Image::make($_FILES['imagen']['tmp_name'])->fit(800, 600);
+    if ($_FILES['propiedad']['tmp_name']['imagen']) {
+        $image = Image::make($_FILES['propiedad']['tmp_name']['imagen'])->fit(800, 600);
         $propiedad->setImagen($nombreImagen);
     }
 
@@ -49,12 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $image->save(CARPETA_IMAGENES . $nombreImagen);
 
         //Guardar en la base de datos
-        $resultado = $propiedad->guardar();
-
-        if ($resultado) {
-            //Redireccionar al usuario para evitar duplicar entradas y además pasarle mensaje por URL para poder mostrarlo en el redireccionamiento
-            header('Location: /admin?resultado=1');
-        }
+        $propiedad->guardar();
     }
 }
 

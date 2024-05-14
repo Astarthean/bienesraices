@@ -1,6 +1,7 @@
 <?php
 
 require '../includes/app.php';
+
 use App\Propiedad;
 
 estaAutenticado();
@@ -16,18 +17,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = filter_var($id, FILTER_VALIDATE_INT);
 
     if ($id) {
-        //Eliminar el archivo
-        $query = "SELECT imagen FROM propiedades WHERE id = $id";
-        $resultado = mysqli_query($db, $query);
-        $propiedad = mysqli_fetch_assoc($resultado);
-        unlink('../imagenes/' . $propiedad['imagen']);
+        //Consulta para obtener los datos de la propiedad
+        $propiedad = Propiedad::find($id);
 
-        //Eliminar la propiedad
-        $query = "DELETE FROM propiedades WHERE id = $id;";
-        $resultado = mysqli_query($db, $query);
-        if ($resultado) {
-            header('Location: /admin?resultado=3');
-        }
+        //Eliminar propiedad
+        $propiedad->eliminar();
     }
 }
 
@@ -56,7 +50,7 @@ incluirTemplate('header');
             </tr>
         </thead>
         <tbody> <!-- Mostrar los resultados de la DB -->
-            <?php foreach($propiedades as $propiedad) : ?>
+            <?php foreach ($propiedades as $propiedad) : ?>
                 <tr>
                     <td> <?php echo $propiedad->id; ?> </td>
                     <td> <?php echo $propiedad->titulo; ?> </td>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Propiedad;
+use Intervention\Image\ImageManagerStatic as Image;
 
 require '../../includes/app.php';
 
@@ -24,119 +25,31 @@ $consulta = "SELECT * FROM vendedores";
 $resultado = mysqli_query($db, $consulta);
 
 //Array con mensajes de errores
-$errores = [];
+$errores = Propiedad::getErrores();
 
 //Ejecutar el código después de que el usuario envia el formulario
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // echo "<pre>";
-    // var_dump($_POST);
-    // echo "</pre>";
+    //Asignar los atributos
+    $args = $_POST['propiedad'];
 
-    //Permite ver el contenido de los archivos FILE
-    // echo "<pre>";
-    // var_dump($_FILES);
-    // echo "</pre>";
+    $propiedad->sincronizar($args);
 
-    //Validacion para las variables para evitar inyecciones SQL, etc
-    $precio = mysqli_real_escape_string($db, $_POST['precio']);
-    $titulo = mysqli_real_escape_string($db, $_POST['titulo']);
-    $descripcion = mysqli_real_escape_string($db, $_POST['descripcion']);
-    $habitaciones = mysqli_real_escape_string($db, $_POST['habitaciones']);
-    $wc = mysqli_real_escape_string($db, $_POST['wc']);
-    $parking = mysqli_real_escape_string($db, $_POST['parking']);
-    $vendedores_id = mysqli_real_escape_string($db, $_POST['vendedor']);
-    $creado = date('Y/m/d');
+    //Validacion
+    $errores = $propiedad->validar();
 
-    //Asignar files a una variables
-    $imagen = $_FILES['imagen'];
-
-    if (!$titulo) {
-        $errores[] = "Debes añadir un titulo";
+    //Subida de archivos
+    $nombreImagen = md5(uniqid(rand(), true)) . ".jpg";
+    if ($_FILES['propiedad']['tmp_name']['imagen']) {
+        $image = Image::make($_FILES['propiedad']['tmp_name']['imagen'])->fit(800, 600);
+        $propiedad->setImagen($nombreImagen);
     }
 
-    if (!$precio) {
-        $errores[] = "Debes añadir un precio";
-    }
-
-    if (strlen($descripcion) < 50) {
-        $errores[] = "La descripción es obligatoria y tiene que contener al menos 50 caracteres";
-    }
-
-    if (!$habitaciones) {
-        $errores[] = "Debes añadir el numero de habitaciones";
-    }
-
-    if (!$wc) {
-        $errores[] = "Debes añadir el numero de baños";
-    }
-
-    if (!$parking) {
-        $errores[] = "Debes añadir el numero de parking";
-    }
-
-    if (!$vendedores_id) {
-        $errores[] = "Debes elegir el vendedor";
-    }
-
-    //Ya no es obligatorio, es opcional
-    // if (!$imagen['name'] || $imagen['error']) {
-    //     $errores[] = "La imagen es obligatoria";
-    // }
-
-    //Validar tamaño de la imagen para no cargar el servidor
-    $medida = 1000 * 1000;
-    if ($imagen['size'] > $medida) {
-        $errores[] = "La imagen pesa mucho";
-    }
-
-    // echo "<pre>";
-    // var_dump($errores);
-    // echo "</pre>";
-
-    //Revisar que el array de errores esta vacio
     if (empty($errores)) {
+        //Almacenar la imagen
+        $image->save(CARPETA_IMAGENES . $nombreImagen);
 
-        /* SUBIDA DE ARCHIVOS */
-
-        //Crear carpeta
-        $carpetaImagenes = '../../imagenes/';
-        if (!is_dir($carpetaImagenes)) {
-            mkdir($carpetaImagenes);
-        }
-
-        $nombreImagen = '';
-
-        if ($imagen['name']) {
-            //Eliminar la imagen previa. Se usa unlink
-            unlink($carpetaImagenes . $propiedad['imagen']);
-            //Generar nombre único para la imagen
-            $nombreImagen = md5(uniqid(rand(), true)) . ".jpg";
-            //Subir imagen
-            move_uploaded_file($imagen['tmp_name'], $carpetaImagenes . $nombreImagen);
-        } else {
-            $nombreImagen = $propiedad['imagen'];
-        }
-
-        //Insertar en la DB
-        $query = "UPDATE propiedades SET 
-        titulo = '$titulo', 
-        precio = '$precio',
-        imagen = '$nombreImagen',
-        descripcion = '$descripcion', 
-        habitaciones = $habitaciones, 
-        wc = $wc, 
-        parking = $parking, 
-        vendedores_id = $vendedores_id 
-        WHERE id = $id; ";
-
-        // echo $query;
-
-        $resultado = mysqli_query($db, $query);
-        if ($resultado) {
-            //Redireccionar al usuario para evitar duplicar entradas y además pasarle mensaje por URL para poder mostrarlo en el redireccionamiento
-            header('Location: /admin?resultado=2');
-        }
+        $propiedad->guardar();
     }
 }
 
