@@ -24,7 +24,7 @@ $propiedad = Propiedad::find($id);
 $consulta = "SELECT * FROM vendedores";
 $resultado = mysqli_query($db, $consulta);
 
-//Array con mensajes de errores
+//Array con mensajes de erorres
 $errores = Propiedad::getErrores();
 
 //Ejecutar el código después de que el usuario envia el formulario
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $propiedad->sincronizar($args);
 
-    //Validacion
+    //Validation
     $errores = $propiedad->validar();
 
     //Subida de archivos
