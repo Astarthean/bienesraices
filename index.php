@@ -33,7 +33,6 @@ incluirTemplate('header', true);
 <section class="seccion contenedor">
    <h2>Casas y Apartamentos en Venta</h2>
    <?php
-      $limite = 3;
       include 'includes/templates/anuncios.php';
    ?>
    <div class="alinear-derecha">
